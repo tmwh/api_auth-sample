@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+
+require 'rest-client'
+require 'api_auth'
+
+class SampleClient < Struct.new(:client_id, :secret)
+  def fetch(url)
+    request_api(url)
+  end
+
+  private
+
+  def request_api(api_path, parameters = {})
+    prepared_api_path = assign_parameters(api_path, parameters)
+    signed_request    = build_signed_request(prepared_api_path)
+    response          = signed_request.execute
+    parse_response(response)
+  end
+
+  def build_signed_request(api_url)
+    request = RestClient::Request.new(url: api_url, method: :get, headers: { content_type: :json })
+    ApiAuth.sign!(request, client_id, secret)
+    request
+  end
+
+  def assign_parameters(api_path, parameters)
+    parameters.each_with_object(api_path.dup) do |(key, value), result_api_path|
+      result_api_path.gsub!(/{#{key.to_s}}/, value.to_s)
+    end
+  end
+
+  def parse_response(response)
+    JSON.parse(response)
+  end
+end
+
+if ARGV.count < 3
+  puts 'USAGE: sample_client.rb client_id secret url'
+  exit
+end
+
+client_id, secret, url = ARGV
+p SampleClient.new(client_id, secret).fetch(url)

@@ -1,0 +1,9 @@
+table.table
+  tr
+    th client id
+    th client secret
+
+  - @access_keys.each do |access_key|
+    tr
+      td= access_key.id
+      td= access_key.secret

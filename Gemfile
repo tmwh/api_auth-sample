@@ -18,6 +18,7 @@ gem 'pg'
 gem 'simple_form'
 gem 'slim-rails'
 gem 'thin'
+gem 'api-auth'
 group :development do
   gem 'better_errors'
   gem 'hub', :require=>nil
